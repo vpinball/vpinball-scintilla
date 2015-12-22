@@ -66,6 +66,9 @@ static void ColouriseVPDoc(Sci_PositionU startPos, Sci_Position length, int init
 	WordList &keywords2 = *keywordlists[1];
 	WordList &keywords3 = *keywordlists[2];
 	WordList &keywords4 = *keywordlists[3];
+	WordList &keywords5 = *keywordlists[4];
+	WordList &keywords6 = *keywordlists[5];
+	WordList &keywords7 = *keywordlists[6];
 
 	styler.StartAt(startPos);
 
@@ -106,13 +109,23 @@ static void ColouriseVPDoc(Sci_PositionU startPos, Sci_Position length, int init
 				} else {
 					if (keywords.InList(s)) {
 						sc.ChangeState(SCE_B_KEYWORD);
-					} else if (keywords2.InList(s)) {
-						sc.ChangeState(SCE_B_KEYWORD2);
-					} else if (keywords3.InList(s)) {
-						sc.ChangeState(SCE_B_KEYWORD3);
 					} else if (keywords4.InList(s)) {
 						sc.ChangeState(SCE_B_KEYWORD4);
+					} else if (keywords3.InList(s)) {
+						sc.ChangeState(SCE_B_KEYWORD3);
+					} else if (keywords2.InList(s)) {
+						sc.ChangeState(SCE_B_KEYWORD2);
+					} else if (keywords5.InList(s)) {
+						sc.ChangeState(SCE_B_KEYWORD5);
+					} else if (keywords6.InList(s)) {
+						sc.ChangeState(SCE_B_KEYWORD6);
+					} else if (keywords7.InList(s)) {
+						sc.ChangeState(SCE_B_KEYWORD7);	
 					}	// Else, it is really an identifier...
+					if (keywords5.InList(s))
+					{
+						sc.ChangeState(SCE_B_KEYWORD5);
+					}
 					sc.SetState(SCE_B_DEFAULT);
 				}
 			}
@@ -241,13 +254,23 @@ static void ColouriseVPDoc(Sci_PositionU startPos, Sci_Position length, int init
 		} else {
 			if (keywords.InList(s)) {
 				sc.ChangeState(SCE_B_KEYWORD);
-			} else if (keywords2.InList(s)) {
-				sc.ChangeState(SCE_B_KEYWORD2);
-			} else if (keywords3.InList(s)) {
-				sc.ChangeState(SCE_B_KEYWORD3);
 			} else if (keywords4.InList(s)) {
 				sc.ChangeState(SCE_B_KEYWORD4);
+			} else if (keywords3.InList(s)) {
+				sc.ChangeState(SCE_B_KEYWORD3);
+			} else if (keywords2.InList(s)) {
+				sc.ChangeState(SCE_B_KEYWORD2);
+			} else if (keywords5.InList(s)) {
+				sc.ChangeState(SCE_B_KEYWORD5);
+			} else if (keywords6.InList(s)) {
+				sc.ChangeState(SCE_B_KEYWORD6);
+			} else if (keywords7.InList(s)) {
+				sc.ChangeState(SCE_B_KEYWORD7);	
 			}	// Else, it is really an identifier...
+					if (keywords5.InList(s))
+					{
+						sc.ChangeState(SCE_B_KEYWORD5);
+					}
 			sc.SetState(SCE_B_DEFAULT);
 		}
 	}
@@ -308,10 +331,13 @@ static void ColouriseVPScriptDoc(Sci_PositionU startPos, Sci_Position length, in
 }
 
 static const char * const vpWordListDesc[] = {
-	"Keywords",
+	"VBKeywords",
 	"user1",
 	"user2",
 	"user3",
+	"user4",
+	"user5",
+	"user6",
 	0
 };
 
