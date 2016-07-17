@@ -1,8 +1,9 @@
 // Scintilla source code edit control
-/** @file LexVB.cxx
- ** Lexer for Visual Basic and VBScript.
+/** @file LexVP.cxx
+ ** Lexer for Visual Pinball and VPScript.
  **/
 // Copyright 1998-2005 by Neil Hodgson <neilh@scintilla.org>
+// Ameded 2015
 // The License.txt file describes the conditions under which this software may be distributed.
 
 #include <stdlib.h>
@@ -28,10 +29,10 @@ using namespace Scintilla;
 #endif
 
 // Internal state, highlighted as number
-#define SCE_B_FILENUMBER SCE_B_DEFAULT+100
+#define SCE_B_FILENUMBER SCE_B_DEFAULT+101
 
 
-static bool IsVBComment(Accessor &styler, Sci_Position pos, Sci_Position len) {
+static bool IsVPComment(Accessor &styler, Sci_Position pos, Sci_Position len) {
 	return len > 0 && styler[pos] == '\'';
 }
 
@@ -42,7 +43,7 @@ static inline bool IsTypeCharacter(int ch) {
 // Extended to accept accented characters
 static inline bool IsAWordChar(int ch) {
 	return ch >= 0x80 ||
-	       (isalnum(ch) || ch == '.' || ch == '_');
+	       (isalnum(ch) || ch == '_'); // This is it!
 }
 
 static inline bool IsAWordStart(int ch) {
@@ -58,13 +59,16 @@ static inline bool IsANumberChar(int ch) {
              ch == '.' || ch == '-' || ch == '+');
 }
 
-static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
-                           WordList *keywordlists[], Accessor &styler, bool vbScriptSyntax) {
+static void ColouriseVPDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
+                           WordList *keywordlists[], Accessor &styler, bool vpScriptSyntax) {
 
 	WordList &keywords = *keywordlists[0];
 	WordList &keywords2 = *keywordlists[1];
 	WordList &keywords3 = *keywordlists[2];
 	WordList &keywords4 = *keywordlists[3];
+	WordList &keywords5 = *keywordlists[4];
+	WordList &keywords6 = *keywordlists[5];
+	WordList &keywords7 = *keywordlists[6];
 
 	styler.StartAt(startPos);
 
@@ -84,11 +88,11 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 			sc.SetState(SCE_B_DEFAULT);
 		} else if (sc.state == SCE_B_IDENTIFIER) {
 			if (!IsAWordChar(sc.ch)) {
-				// In Basic (except VBScript), a variable name or a function name
+				// In Basic (except VPScript), a variable name or a function name
 				// can end with a special character indicating the type of the value
 				// held or returned.
 				bool skipType = false;
-				if (!vbScriptSyntax && IsTypeCharacter(sc.ch)) {
+				if (!vpScriptSyntax && IsTypeCharacter(sc.ch)) {
 					sc.Forward();	// Skip it
 					skipType = true;
 				}
@@ -105,13 +109,23 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 				} else {
 					if (keywords.InList(s)) {
 						sc.ChangeState(SCE_B_KEYWORD);
-					} else if (keywords2.InList(s)) {
-						sc.ChangeState(SCE_B_KEYWORD2);
-					} else if (keywords3.InList(s)) {
-						sc.ChangeState(SCE_B_KEYWORD3);
 					} else if (keywords4.InList(s)) {
 						sc.ChangeState(SCE_B_KEYWORD4);
+					} else if (keywords3.InList(s)) {
+						sc.ChangeState(SCE_B_KEYWORD3);
+					} else if (keywords2.InList(s)) {
+						sc.ChangeState(SCE_B_KEYWORD2);
+					} else if (keywords5.InList(s)) {
+						sc.ChangeState(SCE_B_KEYWORD5);
+					} else if (keywords6.InList(s)) {
+						sc.ChangeState(SCE_B_KEYWORD6);
+					} else if (keywords7.InList(s)) {
+						sc.ChangeState(SCE_B_KEYWORD7);	
 					}	// Else, it is really an identifier...
+					if (keywords5.InList(s))
+					{
+						sc.ChangeState(SCE_B_KEYWORD5);
+					}
 					sc.SetState(SCE_B_DEFAULT);
 				}
 			}
@@ -122,7 +136,7 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 				sc.SetState(SCE_B_DEFAULT);
 			}
 		} else if (sc.state == SCE_B_STRING) {
-			// VB doubles quotes to preserve them, so just end this string
+			// VP doubles quotes to preserve them, so just end this string
 			// state now as a following quote will start again
 			if (sc.ch == '\"') {
 				if (sc.chNext == '\"') {
@@ -219,11 +233,11 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 	}
 
 	if (sc.state == SCE_B_IDENTIFIER && !IsAWordChar(sc.ch)) {
-		// In Basic (except VBScript), a variable name or a function name
+		// In Basic (except VPScript), a variable name or a function name
 		// can end with a special character indicating the type of the value
 		// held or returned.
 		bool skipType = false;
-		if (!vbScriptSyntax && IsTypeCharacter(sc.ch)) {
+		if (!vpScriptSyntax && IsTypeCharacter(sc.ch)) {
 			sc.Forward();	// Skip it
 			skipType = true;
 		}
@@ -240,13 +254,23 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 		} else {
 			if (keywords.InList(s)) {
 				sc.ChangeState(SCE_B_KEYWORD);
-			} else if (keywords2.InList(s)) {
-				sc.ChangeState(SCE_B_KEYWORD2);
-			} else if (keywords3.InList(s)) {
-				sc.ChangeState(SCE_B_KEYWORD3);
 			} else if (keywords4.InList(s)) {
 				sc.ChangeState(SCE_B_KEYWORD4);
+			} else if (keywords3.InList(s)) {
+				sc.ChangeState(SCE_B_KEYWORD3);
+			} else if (keywords2.InList(s)) {
+				sc.ChangeState(SCE_B_KEYWORD2);
+			} else if (keywords5.InList(s)) {
+				sc.ChangeState(SCE_B_KEYWORD5);
+			} else if (keywords6.InList(s)) {
+				sc.ChangeState(SCE_B_KEYWORD6);
+			} else if (keywords7.InList(s)) {
+				sc.ChangeState(SCE_B_KEYWORD7);	
 			}	// Else, it is really an identifier...
+					if (keywords5.InList(s))
+					{
+						sc.ChangeState(SCE_B_KEYWORD5);
+					}
 			sc.SetState(SCE_B_DEFAULT);
 		}
 	}
@@ -254,7 +278,7 @@ static void ColouriseVBDoc(Sci_PositionU startPos, Sci_Position length, int init
 	sc.Complete();
 }
 
-static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int,
+static void FoldVPDoc(Sci_PositionU startPos, Sci_Position length, int,
 						   WordList *[], Accessor &styler) {
 	Sci_Position endPos = startPos + length;
 
@@ -267,7 +291,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int,
 		}
 	}
 	int spaceFlags = 0;
-	int indentCurrent = styler.IndentAmount(lineCurrent, &spaceFlags, IsVBComment);
+	int indentCurrent = styler.IndentAmount(lineCurrent, &spaceFlags, IsVPComment);
 	char chNext = styler[startPos];
 	for (Sci_Position i = startPos; i < endPos; i++) {
 		char ch = chNext;
@@ -275,7 +299,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int,
 
 		if ((ch == '\r' && chNext != '\n') || (ch == '\n') || (i == endPos)) {
 			int lev = indentCurrent;
-			int indentNext = styler.IndentAmount(lineCurrent + 1, &spaceFlags, IsVBComment);
+			int indentNext = styler.IndentAmount(lineCurrent + 1, &spaceFlags, IsVPComment);
 			if (!(indentCurrent & SC_FOLDLEVELWHITEFLAG)) {
 				// Only non whitespace lines can be headers
 				if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext & SC_FOLDLEVELNUMBERMASK)) {
@@ -283,7 +307,7 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int,
 				} else if (indentNext & SC_FOLDLEVELWHITEFLAG) {
 					// Line after is blank so check the next - maybe should continue further?
 					int spaceFlags2 = 0;
-					int indentNext2 = styler.IndentAmount(lineCurrent + 2, &spaceFlags2, IsVBComment);
+					int indentNext2 = styler.IndentAmount(lineCurrent + 2, &spaceFlags2, IsVPComment);
 					if ((indentCurrent & SC_FOLDLEVELNUMBERMASK) < (indentNext2 & SC_FOLDLEVELNUMBERMASK)) {
 						lev |= SC_FOLDLEVELHEADERFLAG;
 					}
@@ -296,24 +320,27 @@ static void FoldVBDoc(Sci_PositionU startPos, Sci_Position length, int,
 	}
 }
 
-static void ColouriseVBNetDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
+static void ColouriseVPNetDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
                            WordList *keywordlists[], Accessor &styler) {
-	ColouriseVBDoc(startPos, length, initStyle, keywordlists, styler, false);
+	ColouriseVPDoc(startPos, length, initStyle, keywordlists, styler, false);
 }
 
-static void ColouriseVBScriptDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
+static void ColouriseVPScriptDoc(Sci_PositionU startPos, Sci_Position length, int initStyle,
                            WordList *keywordlists[], Accessor &styler) {
-	ColouriseVBDoc(startPos, length, initStyle, keywordlists, styler, true);
+	ColouriseVPDoc(startPos, length, initStyle, keywordlists, styler, true);
 }
 
-static const char * const vbWordListDesc[] = {
-	"Keywords",
+static const char * const vpWordListDesc[] = {
+	"VBKeywords",
 	"user1",
 	"user2",
 	"user3",
+	"user4",
+	"user5",
+	"user6",
 	0
 };
 
-LexerModule lmVB(SCLEX_VB, ColouriseVBNetDoc, "vb", FoldVBDoc, vbWordListDesc);
-LexerModule lmVBScript(SCLEX_VBSCRIPT, ColouriseVBScriptDoc, "vbscript", FoldVBDoc, vbWordListDesc);
+LexerModule lmVP(SCLEX_VP, ColouriseVPNetDoc, "vp", FoldVPDoc, vpWordListDesc);
+LexerModule lmVPScript(SCLEX_VPSCRIPT, ColouriseVPScriptDoc, "vpscript", FoldVPDoc, vpWordListDesc);
 
