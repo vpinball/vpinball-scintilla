@@ -11,16 +11,13 @@
 
 #include "CaseFolder.h"
 #include "CaseConvert.h"
-#include "UniConversion.h"
 
-#ifdef SCI_NAMESPACE
 using namespace Scintilla;
-#endif
 
 CaseFolder::~CaseFolder() {
 }
 
-CaseFolderTable::CaseFolderTable() {
+CaseFolderTable::CaseFolderTable() noexcept : mapping{}  {
 	for (size_t iChar=0; iChar<sizeof(mapping); iChar++) {
 		mapping[iChar] = static_cast<char>(iChar);
 	}
@@ -33,18 +30,18 @@ size_t CaseFolderTable::Fold(char *folded, size_t sizeFolded, const char *mixed,
 	if (lenMixed > sizeFolded) {
 		return 0;
 	} else {
-		for (size_t i=0; i<lenMixed; ++i) {
+		for (size_t i=0; i<lenMixed; i++) {
 			folded[i] = mapping[static_cast<unsigned char>(mixed[i])];
 		}
 		return lenMixed;
 	}
 }
 
-void CaseFolderTable::SetTranslation(char ch, char chTranslation) {
+void CaseFolderTable::SetTranslation(char ch, char chTranslation) noexcept {
 	mapping[static_cast<unsigned char>(ch)] = chTranslation;
 }
 
-void CaseFolderTable::StandardASCII() {
+void CaseFolderTable::StandardASCII() noexcept {
 	for (size_t iChar=0; iChar<sizeof(mapping); iChar++) {
 		if (iChar >= 'A' && iChar <= 'Z') {
 			mapping[iChar] = static_cast<char>(iChar - 'A' + 'a');
