@@ -333,7 +333,7 @@ static void ColouriseVPScriptDoc(Sci_PositionU startPos, Sci_Position length, in
 }
 
 static const char * const vpWordListDesc[] = {
-	"Keywords",
+	"VBKeywords",
 	"user1",
 	"user2",
 	"user3",
