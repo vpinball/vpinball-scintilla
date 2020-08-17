@@ -115,7 +115,7 @@ Document::Document(int options) :
 #else
 	eolMode = SC_EOL_LF;
 #endif
-	dbcsCodePage = SC_CP_UTF8;
+	dbcsCodePage = 0;// SC_CP_UTF8; // single byte (Latin-1 ?!?)
 	lineEndBitSet = SC_LINE_END_TYPE_DEFAULT;
 	endStyled = 0;
 	styleClock = 0;
